@@ -24,6 +24,35 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("login-form");
   const closeLoginModal = document.querySelector(".close-login-modal");
   const loginMessage = document.getElementById("login-message");
+  const darkModeToggle = document.getElementById("dark-mode-toggle");
+
+  // Dark mode state
+  function initializeDarkMode() {
+    const savedMode = localStorage.getItem("darkMode");
+    if (savedMode === "enabled") {
+      document.body.classList.add("dark-mode");
+      darkModeToggle.querySelector("span").textContent = "☀️";
+      darkModeToggle.title = "Switch to light mode";
+      darkModeToggle.setAttribute("aria-label", "Switch to light mode");
+    }
+  }
+
+  function toggleDarkMode() {
+    const isDark = document.body.classList.toggle("dark-mode");
+    if (isDark) {
+      localStorage.setItem("darkMode", "enabled");
+      darkModeToggle.querySelector("span").textContent = "☀️";
+      darkModeToggle.title = "Switch to light mode";
+      darkModeToggle.setAttribute("aria-label", "Switch to light mode");
+    } else {
+      localStorage.setItem("darkMode", "disabled");
+      darkModeToggle.querySelector("span").textContent = "🌙";
+      darkModeToggle.title = "Switch to dark mode";
+      darkModeToggle.setAttribute("aria-label", "Switch to dark mode");
+    }
+  }
+
+  darkModeToggle.addEventListener("click", toggleDarkMode);
 
   // School name used for sharing
   const SCHOOL_NAME = document.querySelector("h1")?.textContent || "Mergington High School";
@@ -933,6 +962,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Initialize app
+  initializeDarkMode();
   checkAuthentication();
   initializeFilters();
   fetchActivities();
