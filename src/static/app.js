@@ -54,8 +54,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   darkModeToggle.addEventListener("click", toggleDarkMode);
 
-  // School name used for sharing
-  const SCHOOL_NAME = document.querySelector("h1")?.textContent || "Mergington High School";
+  // Dark mode toggle
+  const darkModeToggle = document.getElementById("dark-mode-toggle");
+
+  function applyTheme(isDark) {
+    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+    const label = isDark ? "Switch to light mode" : "Switch to dark mode";
+    darkModeToggle.textContent = isDark ? "☀️" : "🌙";
+    darkModeToggle.title = label;
+    darkModeToggle.setAttribute("aria-label", label);
+  }
+
+  const savedTheme = localStorage.getItem("theme");
+  applyTheme(savedTheme === "dark");
+
+  darkModeToggle.addEventListener("click", () => {
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    localStorage.setItem("theme", isDark ? "light" : "dark");
+    applyTheme(!isDark);
+  });
 
   // Activity categories with corresponding colors
   const activityTypes = {
