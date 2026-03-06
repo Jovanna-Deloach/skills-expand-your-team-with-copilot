@@ -54,6 +54,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   darkModeToggle.addEventListener("click", toggleDarkMode);
 
+  // School name used for sharing
+  const SCHOOL_NAME = document.querySelector("h1")?.textContent || "Mergington High School";
+
   // Activity categories with corresponding colors
   const activityTypes = {
     sports: { label: "Sports", color: "#e8f5e9", textColor: "#2e7d32" },
@@ -598,6 +601,15 @@ document.addEventListener("DOMContentLoaded", () => {
         `
         }
       </div>
+      <div class="share-section">
+        <span class="share-label">Share:</span>
+        <div class="share-buttons">
+          <button class="share-button share-twitter" data-activity="${name}" title="Share on X (Twitter)" aria-label="Share on X (Twitter)">𝕏</button>
+          <button class="share-button share-whatsapp" data-activity="${name}" title="Share on WhatsApp" aria-label="Share on WhatsApp">💬</button>
+          <button class="share-button share-email" data-activity="${name}" title="Share via Email" aria-label="Share via Email">✉️</button>
+          <button class="share-button share-copy" data-activity="${name}" title="Copy link" aria-label="Copy link">🔗</button>
+        </div>
+      </div>
     `;
 
     // Add click handlers for delete buttons
@@ -615,6 +627,65 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    // Add click handlers for share buttons
+    const shareButtons = activityCard.querySelectorAll(".share-button");
+    shareButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const activityName = button.dataset.activity;
+        const schedule = formatSchedule(details);
+        const shareText = `Check out "${activityName}" at ${SCHOOL_NAME}! ${details.description} Schedule: ${schedule}`;
+        const shareUrl = `${window.location.origin}${window.location.pathname}?activity=${encodeURIComponent(activityName)}`;
+
+        if (button.classList.contains("share-twitter")) {
+          window.open(
+            `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+            "_blank",
+            "noopener,noreferrer"
+          );
+        } else if (button.classList.contains("share-whatsapp")) {
+          window.open(
+            `https://wa.me/?text=${encodeURIComponent(shareText + " " + shareUrl)}`,
+            "_blank",
+            "noopener,noreferrer"
+          );
+        } else if (button.classList.contains("share-email")) {
+          window.location.href = `mailto:?subject=${encodeURIComponent(`Check out: ${activityName}`)}&body=${encodeURIComponent(shareText + "\n\n" + shareUrl)}`;
+        } else if (button.classList.contains("share-copy")) {
+          navigator.clipboard.writeText(shareUrl).then(() => {
+            const originalText = button.textContent;
+            button.textContent = "✅";
+            button.title = "Link copied!";
+            setTimeout(() => {
+              button.textContent = originalText;
+              button.title = "Copy link";
+            }, 2000);
+          }).catch(() => {
+            // Fallback for browsers that don't support clipboard API
+            try {
+              const tempInput = document.createElement("input");
+              tempInput.value = shareUrl;
+              document.body.appendChild(tempInput);
+              tempInput.select();
+              document.execCommand("copy");
+              document.body.removeChild(tempInput);
+              const originalText = button.textContent;
+              button.textContent = "✅";
+              button.title = "Link copied!";
+              setTimeout(() => {
+                button.textContent = originalText;
+                button.title = "Copy link";
+              }, 2000);
+            } catch {
+              button.title = "Copy failed. Please copy the URL manually.";
+              setTimeout(() => {
+                button.title = "Copy link";
+              }, 3000);
+            }
+          });
+        }
+      });
+    });
 
     activitiesList.appendChild(activityCard);
   }
